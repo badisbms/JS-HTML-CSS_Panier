@@ -107,8 +107,13 @@
   
     border: 1px solid black;
     border-radius: 20px;
-  
-  
-  
+
+  }
+
+  .tableProduct  input {
+
+    /* width: 10px; */
+    position: relative;
+    top: 90px;
   }
   
