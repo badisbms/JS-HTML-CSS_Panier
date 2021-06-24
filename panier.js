@@ -1,6 +1,6 @@
 // #################Section formulaire de création d'objets Local Storage########################################################
-validate.addEventListener("click", addObjectToLs);
 
+// Creation d'une classe afin de pouvoir créer mes produits
 class myProduct {
   constructor(ref, nameProduct, descriptionProduct, price, stock) {
     this.ref = ref;
@@ -13,8 +13,17 @@ class myProduct {
 
 count = 0;
 count2 = 0;
+resultat = 0;
 
-function addObjectToLs() {
+portfolio = 8000
+
+portfolioUser.innerHTML = `Mon portefeuille : ${8000}€`
+
+//Bouton Valider votre article
+validate.addEventListener("click", addObjectToLocalStorage);
+
+function addObjectToLocalStorage() {
+  //Me permet de nommer la clé de mon LocalStorage
   cle = key.value;
 
   var monProduit = new myProduct(
@@ -48,9 +57,7 @@ function localStorageToTable() {
   tableProduct.innerHTML = "";
 
   for (let index = 0; index < localStorage.length; index++) {
-    //String exemple : {"ref":"ABCEF","nameProduct":"Iphone","descriptionProduct":"is iphone","price":"852","stock":"8521"}
     localStorValues = localStorage.getItem(localStorage.key(index));
-    // Objet
     listOfLSvalues = JSON.parse(localStorValues);
 
     tr = document.createElement("tr");
@@ -59,10 +66,10 @@ function localStorageToTable() {
     td1.innerHTML = listOfLSvalues.ref;
 
     td2 = document.createElement("td");
-    a=document.createElement("a");
-    a.setAttribute("href","#")
-    a.innerHTML= listOfLSvalues.nameProduct
-    td2.appendChild(a)
+    a = document.createElement("a");
+    a.setAttribute("href", "#");
+    a.innerHTML = listOfLSvalues.nameProduct;
+    td2.appendChild(a);
 
     td3 = document.createElement("td");
     td3.innerHTML = listOfLSvalues.descriptionProduct;
@@ -76,17 +83,14 @@ function localStorageToTable() {
     td6 = document.createElement("td");
     addTocart = document.createElement("button");
     addTocart.className = "buttonsAdd";
-    addTocart.innerHTML = "Acheter";
+    addTocart.innerHTML = "Ajouter au panier";
     td6.appendChild(addTocart);
 
     td7 = document.createElement("td");
     modify = document.createElement("button");
-    modify.className = "buttonsModify"
+    modify.className = "buttonsModify";
     modify.innerHTML = "Modifier Produit";
     td7.appendChild(modify);
-
-   
-
 
     td8 = document.createElement("input");
     td8.setAttribute("type", "number");
@@ -102,20 +106,21 @@ function localStorageToTable() {
 
     tableProduct.appendChild(tr);
 
+    //Boucle qui permet d'itérer dans mes boutons afin de leur donner un id unique (égal a clé de mon LS)
+    //grace a la classe donnée en amont → permet d'être sur de récuper dans le LS la val du BON bouton 
     buttons = document.querySelectorAll(".buttonsAdd");
 
     for (i = 0; i < buttons.length; i++) {
       element = buttons[i];
 
       for (let z = 0; z < localStorage.key(i).length; z++) {
-        element.id = `${localStorage.key(i)}`;
+        element.id = `${localStorage.key(i)}`; // id egal a clé du LS
         td8.setAttribute("class", "inputss");
         td8.setAttribute("placeholder", "Entrez la quantité puis Entrée");
       }
     }
 
-    element.addEventListener("click", changeValueStock);
-
+    //Idem
     myInputs = document.querySelectorAll(".inputss");
 
     for (f = 0; f < myInputs.length; f++) {
@@ -126,9 +131,7 @@ function localStorageToTable() {
       }
     }
 
-    element2.addEventListener("change", getValue);
-
-    
+    //Idem
     buttonsModify = document.querySelectorAll(".buttonsModify");
 
     for (l = 0; l < buttonsModify.length; l++) {
@@ -139,37 +142,17 @@ function localStorageToTable() {
       }
     }
 
-    element3.addEventListener("click", putValueToForm)
-   
+    element.addEventListener("click", changeValueStock);
+
+    element2.addEventListener("change", getValue);
+
+    element3.addEventListener("click", putValueToForm);
   }
-
-
 }
 
-
-function putValueToForm() {
-
-  localStorValues3 = localStorage.getItem(localStorage.key(event.target.id));
-
-  NlistOfLSvalues = JSON.parse(localStorValues3);
-
- removeAfromNameProduct = event.target.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.innerText
-
-  key.value = event.target.id;
-  ref.value = NlistOfLSvalues.ref;
-  nameProduct.value = removeAfromNameProduct;
-  descriptionProduct.value = NlistOfLSvalues.descriptionProduct;
-  price.value = NlistOfLSvalues.price;
-  stock.value = NlistOfLSvalues.stock;
-  
-}
-
-
-function getValue() {
-  this.innerHTML = this.value;
-}
-
+//A PERFECTIONNER → pas eu le temps de finir pour la gestion des stock dans la liste des produits 
 function changeValueStock() {
+  recap.style.display = "block";
   count++;
 
   //Me permet de recupérer la valeur frere du bouton cliqué
@@ -195,20 +178,29 @@ function changeValueStock() {
 
   localStorage.setItem(buttonID, JSON.stringify(updateObject));
 
-  test();
+  putValuetoBasket();
 }
 
-function test() {
+
+//Fontion qui va permettre de recupérer les valuer afin de les mettre au panier
+//J'ai choisi le sessionStorage pour que les valeurs soit ephemeres, et pour dissocier le LS et le SS 
+function putValuetoBasket() {
+
+  //Je recup l'id de mon bouton, qui est égal a la clé de l'element ciblé, afin de le reutiliser pour créer un clé dans mon SS 
   buttonID = event.target.id;
+  //Me permet de recup la val de l'input (quantité)
   inputValue = event.target.parentElement.nextSibling.nextSibling.innerHTML;
 
+  //Je cicble mon tableau de produit HTML et j'itere dedans afin de recup les valeur pour mon stringify
   html2 = event.target.parentElement.parentElement.children;
 
+  //Je crée donc un nouvel objet avec les valeur de ma liste de prod
   for (let q = 0; q < html.length; q++) {
     var updateObject2 = new myProduct(
       html[0].innerHTML,
       html[1].innerHTML,
       html[2].innerHTML,
+      inputValue,
       html[3].innerHTML * inputValue
     );
   }
@@ -218,46 +210,117 @@ function test() {
   tablePanier.innerHTML = "";
 
   for (let index = 0; index < sessionStorage.length; index++) {
-    
     SessionStorageValue = sessionStorage.getItem(sessionStorage.key(index));
-    // Objet
-    listOfSSvalues = JSON.parse(SessionStorageValue)
+    listOfSSvalues = JSON.parse(SessionStorageValue);
 
-    if (listOfSSvalues.price === 0 || listOfSSvalues.price === undefined) {
+    if (listOfSSvalues.price > 0) {
+      trb1 = document.createElement("tr");
 
-      console.log("pas de prix");
-      
-    } else if (inputValue  === null || inputValue === undefined) {
+      tb1 = document.createElement("td");
+      tb1.innerHTML = listOfSSvalues.ref;
 
-        alert("pas de qte")
+      tb2 = document.createElement("td");
+      tb2.innerHTML = listOfSSvalues.nameProduct;
 
-    } else {
+      tb3 = document.createElement("td");
+      tb3.innerHTML = listOfSSvalues.descriptionProduct;
 
-    trb1 = document.createElement("tr");
+      tb4 = document.createElement("td");
+      tb4.innerHTML = listOfSSvalues.price + " unités"; //qte
 
-    tb1 = document.createElement("td");
-    tb1.innerHTML = listOfSSvalues.ref;
+      tb5 = document.createElement("td");
+      tb5.innerHTML = listOfSSvalues.stock + "€"; //qte*prix
 
-    tb2 = document.createElement("td");
-    tb2.innerHTML = listOfSSvalues.nameProduct;
+      trb1.appendChild(tb1);
+      trb1.appendChild(tb2);
+      trb1.appendChild(tb3);
+      trb1.appendChild(tb4);
+      trb1.appendChild(tb5);
 
-    tb3 = document.createElement("td");
-    tb3.innerHTML = listOfSSvalues.descriptionProduct;
-
-    tb4 = document.createElement("td");
-    tb4.innerHTML = listOfSSvalues.price+"€"
-
-    trb1.appendChild(tb1);
-    trb1.appendChild(tb2);
-    trb1.appendChild(tb3);
-    trb1.appendChild(tb4);
-
-    tablePanier.appendChild(trb1);
-  }
+      tablePanier.appendChild(trb1);
+    }
   }
 }
 
+function getValue() {
+  this.innerHTML = this.value;
+}
 
+//ACTION bouton modifier de la liste de produit
+function putValueToForm() {
+
+  localStorValues3 = localStorage.getItem(localStorage.key(event.target.id));
+
+  NlistOfLSvalues = JSON.parse(localStorValues3);
+
+  myRef =
+    event.target.parentElement.previousElementSibling.previousElementSibling
+      .previousElementSibling.previousElementSibling.previousElementSibling
+      .previousElementSibling.innerText;
+  removeAfromNameProduct =
+    event.target.parentElement.previousElementSibling.previousElementSibling
+      .previousElementSibling.previousElementSibling.previousElementSibling
+      .innerText;
+  myDescription =
+    event.target.parentElement.previousElementSibling.previousElementSibling
+      .previousElementSibling.previousElementSibling.innerText;
+  myPrice =
+    event.target.parentElement.previousElementSibling.previousElementSibling
+      .previousElementSibling.innerText;
+  myStock =
+    event.target.parentElement.previousElementSibling.previousElementSibling
+      .innerText;
+
+  key.value = event.target.id;
+  ref.value = myRef;
+  nameProduct.value = removeAfromNameProduct;
+  descriptionProduct.value = myDescription;
+  price.value = myPrice;
+  stock.value = myStock;
+}
+
+recap.addEventListener("click", getRecap);
+
+///Action du bouton RECAP 
+function getRecap() {
+
+  tab = [];
+  caca = event.target.previousElementSibling.children[0].children;
+
+  for (let m = 0; m < caca.length; m++) {
+    for (let g = 0; g < caca.length; g++) {
+      bigCaca = caca[g].lastChild.innerHTML;
+
+      a = Number.parseInt(caca[m].lastChild.innerHTML);
+    }
+
+    tab.push(a);
+    var total = tab.reduce((a, b) => a + b, 0);
+
+    console.log(total);
+
+    sousTot.innerHTML = `Votre Sous-Total est de : ${total}€`;
+
+    TvaArr = Math.round(`${total * (8 / 100)}`);
+
+    tax.innerHTML = `Montant des Taxes (TVA à 8%) : ${TvaArr}€`;
+
+    ttc.innerHTML = `Total ttc : ${total + TvaArr}€`;
+
+
+    portfolioUser.innerHTML = `Mon portefeuille : ${portfolio -total + TvaArr}€`
+  }
+}
+
+//Fonction refresh du SessionStorage
+window.onload = function () {
+  sessionStorage.clear();
+};
+//Fonction refresh du SessionStorage
+window.reload = function () {
+  sessionStorage.clear();
+};
+//Fonction reset du Session Storage et du LS au click de "Supprimer vos objets"
 reset.addEventListener("click", resetStorage);
 function resetStorage() {
   sessionStorage.clear();
