@@ -34,6 +34,8 @@ function addObjectToLocalStorage() {
     stock.value
   );
 
+
+
   if (cle === "") {
     alert("Veuillez entrer un nom de produit valide");
   } else {
@@ -57,6 +59,7 @@ function localStorageToTable() {
   tableProduct.innerHTML = "";
 
   for (let index = 0; index < localStorage.length; index++) {
+
     localStorValues = localStorage.getItem(localStorage.key(index));
     listOfLSvalues = JSON.parse(localStorValues);
 
@@ -78,7 +81,17 @@ function localStorageToTable() {
     td4.innerHTML = listOfLSvalues.price;
 
     td5 = document.createElement("td");
-    td5.innerHTML = listOfLSvalues.stock;
+
+    if (listOfLSvalues.stock < 10) {
+
+      td5.style.color = "red"
+      td5.style.fontSize ="20px"
+      td5.innerHTML = `${listOfLSvalues.stock} en stock`;
+      
+    } else {
+      td5.innerHTML = listOfLSvalues.stock
+    }
+    
 
     td6 = document.createElement("td");
     addTocart = document.createElement("button");
@@ -92,8 +105,10 @@ function localStorageToTable() {
     modify.innerHTML = "Modifier Produit";
     td7.appendChild(modify);
 
-    td8 = document.createElement("input");
-    td8.setAttribute("type", "number");
+    td8 = document.createElement("td")
+    myInput = document.createElement("input");
+    myInput.setAttribute("type", "number");
+    td8.appendChild(myInput)
 
     tr.appendChild(td1);
     tr.appendChild(td2);
@@ -110,24 +125,28 @@ function localStorageToTable() {
     //grace a la classe donnée en amont → permet d'être sur de récuper dans le LS la val du BON bouton 
     buttons = document.querySelectorAll(".buttonsAdd");
 
+
+
     for (i = 0; i < buttons.length; i++) {
       element = buttons[i];
 
       for (let z = 0; z < localStorage.key(i).length; z++) {
         element.id = `${localStorage.key(i)}`; // id egal a clé du LS
-        td8.setAttribute("class", "inputss");
-        td8.setAttribute("placeholder", "Entrez la quantité puis Entrée");
+        myInput.setAttribute("class", "inputss");
+        myInput.setAttribute("placeholder", "Entrez la quantité puis Entrée");
       }
     }
 
     //Idem
     myInputs = document.querySelectorAll(".inputss");
 
+
     for (f = 0; f < myInputs.length; f++) {
       element2 = myInputs[f];
 
       for (let w = 0; w < localStorage.key(f).length; w++) {
         element2.id = `${localStorage.key(f)}`;
+
       }
     }
 
@@ -136,7 +155,6 @@ function localStorageToTable() {
 
     for (l = 0; l < buttonsModify.length; l++) {
       element3 = buttonsModify[l];
-
       for (let v = 0; v < localStorage.key(l).length; v++) {
         element3.id = `${localStorage.key(l)}`;
       }
@@ -189,7 +207,7 @@ function putValuetoBasket() {
   //Je recup l'id de mon bouton, qui est égal a la clé de l'element ciblé, afin de le reutiliser pour créer un clé dans mon SS 
   buttonID = event.target.id;
   //Me permet de recup la val de l'input (quantité)
-  inputValue = event.target.parentElement.nextSibling.nextSibling.innerHTML;
+  inputValuetest = event.target.parentElement.nextSibling.nextSibling.children[0].textContent;
 
   //Je cicble mon tableau de produit HTML et j'itere dedans afin de recup les valeur pour mon stringify
   html2 = event.target.parentElement.parentElement.children;
@@ -200,8 +218,8 @@ function putValuetoBasket() {
       html[0].innerHTML,
       html[1].innerHTML,
       html[2].innerHTML,
-      inputValue,
-      html[3].innerHTML * inputValue
+      inputValuetest,
+      html[3].innerHTML * inputValuetest
     );
   }
 
@@ -210,6 +228,7 @@ function putValuetoBasket() {
   tablePanier.innerHTML = "";
 
   for (let index = 0; index < sessionStorage.length; index++) {
+
     SessionStorageValue = sessionStorage.getItem(sessionStorage.key(index));
     listOfSSvalues = JSON.parse(SessionStorageValue);
 
@@ -244,6 +263,7 @@ function putValuetoBasket() {
 
 function getValue() {
   this.innerHTML = this.value;
+
 }
 
 //ACTION bouton modifier de la liste de produit
@@ -296,8 +316,6 @@ function getRecap() {
 
     tab.push(a);
     var total = tab.reduce((a, b) => a + b, 0);
-
-    console.log(total);
 
     sousTot.innerHTML = `Votre Sous-Total est de : ${total}€`;
 
